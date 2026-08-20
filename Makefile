@@ -60,13 +60,13 @@ download-models: download-model-27b download-mmproj-27b
 
 download-model-27b:
 	@echo "Downloading Qwen3.8-27B model weights..."
-	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-gguf-00001-of-00004.gguf \
+	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-00001-of-00004.gguf \
 		--local-dir components/model-q4-k-m-gguf-1-of-4
-	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-gguf-00002-of-00004.gguf \
+	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-00002-of-00004.gguf \
 		--local-dir components/model-q4-k-m-gguf-2-of-4
-	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-gguf-00003-of-00004.gguf \
+	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-00003-of-00004.gguf \
 		--local-dir components/model-q4-k-m-gguf-3-of-4
-	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-gguf-00004-of-00004.gguf \
+	$(hf) download inference-snaps/Qwen3.8-27B-UD-Q4_K_M-5GB Qwen3.8-27B-UD-Q4_K_M-00004-of-00004.gguf \
 		--local-dir components/model-q4-k-m-gguf-4-of-4
 
 download-mmproj-27b:
