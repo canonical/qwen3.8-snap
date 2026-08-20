@@ -7,7 +7,7 @@ SNAP_NAME ?= qwen3-8
 ENGINE ?= cpu
 
 .PHONY: all help init build install upload smoke-test install-deps init-submodules download-models \
-	download-model-4b download-mmproj-4b download-model-9b download-mmproj-9b
+	download-model-27b download-mmproj-27b
 
 all: help
 
