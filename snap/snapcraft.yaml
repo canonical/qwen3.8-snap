@@ -1,0 +1,246 @@
+name: qwen3-8
+base: core24
+summary: Qwen 3.8 inference snap
+description: |
+  This is an inference snap that lets you run Qwen 3.8, a multimodal
+  instruction-tuned model from Qwen with vision capabilities.
+  
+  Before you start, make sure to have the necessary drivers installed on the host:
+  https://documentation.ubuntu.com/inference-snaps/how-to/install-drivers/
+  
+  **Install:**
+  
+  `sudo snap install qwen3-8`
+  
+  **Get help:**
+  
+  `qwen3-8 --help`
+  
+  **Licensing:**
+  
+  The Qwen 3.8 model is provided by Qwen under the Apache 2.0 license.
+
+  The licenses of all bundled software can be found inside the snap at `/snap/qwen3-8/current/usr/share/doc`.
+
+website: https://documentation.ubuntu.com/inference-snaps
+source-code: https://github.com/canonical/qwen3.8-snap
+issues: https://github.com/canonical/inference-snaps/issues
+
+adopt-info: version
+
+grade: stable
+confinement: strict
+compression: lzo
+
+assumes:
+  - snapd2.68 # for components support
+
+platforms:
+  amd64:
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+
+plugs:
+  # To allow sideloading models by root
+  home:
+    read: all
+
+environment:
+  SNAP_COMPONENTS: /snap/$SNAP_INSTANCE_NAME/components/$SNAP_REVISION
+  ARCH_TRIPLET: $CRAFT_ARCH_TRIPLET_BUILD_FOR
+
+hooks:
+  install:
+    plugs: &install-plugs
+      # For hardware detection
+      - hardware-observe
+      - opengl
+  post-refresh:
+    plugs: *install-plugs
+
+parts:
+  version:
+    after: [cli]
+    plugin: nil
+    source: . # To regenerate the git hash on every change
+    build-packages:
+      - jq
+      - git
+    override-pull: |
+      # Do nothing. This significantly reduces build time when sourcing large files.
+    override-build: |
+      set -eo pipefail
+      cli_version=$($CRAFT_STAGE/bin/modelctl version --format=json | jq .cli --raw-output)
+      git_hash=$(git -C "$SNAPCRAFT_PROJECT_DIR" describe --always)
+      craftctl set version="${cli_version#v}+${git_hash}"
+
+  cli:
+    source:
+      - on amd64: https://github.com/canonical/inference-snaps-cli/releases/download/v2.0.0-beta.12/inference-snaps-cli-linux-amd64.tar.xz
+      - on arm64: https://github.com/canonical/inference-snaps-cli/releases/download/v2.0.0-beta.12/inference-snaps-cli-linux-arm64.tar.xz
+    plugin: dump
+    override-build: |
+
+      # For tab completion
+      ln --symbolic ./modelctl bin/qwen3-8
+
+      craftctl default
+    
+  cli-dependencies:
+    plugin: nil
+    stage-packages:
+      - pciutils # lspci
+
+  webui:
+    plugin: dump
+    source: https://github.com/canonical/inference-snaps-webui/releases/download/v1.1.0/inference-snaps-webui.tar.xz
+    organize:
+      "*": webui/
+
+  engines:
+    source: engines
+    plugin: dump
+    organize:
+      "*": engines/
+
+  models:
+    source: models
+    plugin: dump
+    organize:
+      "*": models/
+
+  runtimes:
+    source: runtimes
+    plugin: dump
+    organize:
+      "*": runtimes/
+  
+  scripts:
+    source: scripts
+    plugin: dump
+    stage-packages:
+      - jq
+    organize:
+      "server.sh": bin/
+      "server-webui.sh": bin/
+
+  local-component-files:
+     # Use the cmake plugin instead of "dump" to prevent unwanted copies
+     # See https://github.com/canonical/craft-parts/issues/1609
+    plugin: cmake
+    source: components
+    override-build: |
+      cp -rf --archive --link --no-dereference ${CRAFT_PART_SRC}/* ${CRAFT_PART_INSTALL}
+    organize:
+      "model-q4-k-m-gguf-1-of-4/*": (component/model-q4-k-m-gguf-1-of-4)
+      "model-q4-k-m-gguf-2-of-4/*": (component/model-q4-k-m-gguf-2-of-4)
+      "model-q4-k-m-gguf-3-of-4/*": (component/model-q4-k-m-gguf-3-of-4)
+      "model-q4-k-m-gguf-4-of-4/*": (component/model-q4-k-m-gguf-4-of-4)
+      "mmproj-27b-q4-k-m/*": (component/mmproj-27b-q4-k-m)
+    prime:
+      # Exclude everything not explicitly organized
+      - -*
+
+  llamacpp:
+    plugin: dump
+    source:
+      - on amd64: https://github.com/canonical/llama.cpp-builds/releases/download/b9611/llamacpp-amd64.tar.gz
+      - on arm64: https://github.com/canonical/llama.cpp-builds/releases/download/b9611/llamacpp-arm64.tar.gz
+    override-build: |
+      # Move license files to be included in the snap, not the component
+      mkdir -p $CRAFT_PRIME/usr/share/doc/
+      mv licenses $CRAFT_PRIME/usr/share/doc/llama.cpp
+
+      craftctl default
+    stage-packages:
+      - libgomp1
+    organize:
+      # move everything, including the staged packages
+      "*": (component/llamacpp)
+
+  llamacpp-cuda:
+    plugin: dump
+    source:
+      - on amd64: https://github.com/canonical/llama.cpp-builds/releases/download/b9611/llamacpp-amd64+cuda12.9.tar.gz
+      - on arm64: https://github.com/canonical/llama.cpp-builds/releases/download/b9611/llamacpp-arm64+cuda12.9.tar.gz
+    override-build: |
+      # Move license files to be included in the snap, not the component
+      mkdir -p $CRAFT_PRIME/usr/share/doc/
+      mv licenses $CRAFT_PRIME/usr/share/doc/llama.cpp-cuda
+
+      craftctl default
+    stage-packages:
+      - libgomp1
+    organize:
+      "*": (component/llamacpp-cuda)
+
+  notice:
+    plugin: nil
+    source: NOTICE
+    source-type: file
+    override-build: |
+      license_dir=$CRAFT_PART_INSTALL/usr/share/doc
+      mkdir -p $license_dir
+      cp NOTICE $license_dir/
+      cp $SNAPCRAFT_PROJECT_DIR/LICENSE $license_dir/
+      cp $SNAPCRAFT_PROJECT_DIR/LICENSE-qwen3.8 $license_dir/
+components:
+  mmproj-27b-q4-k-m:
+    type: standard
+    summary: Qwen 3.8 27B multimodal projector
+    description: BF16 multimodal projection weights for the Qwen 3.8 27B vision inputs.
+
+  model-q4-k-m-gguf-1-of-4: &model-27b
+    type: standard
+    summary: Qwen 3.8 27B UD Q4_K_M GGUF weights (shard 1 of 4)
+    description: GGUF shard of the Qwen 3.8 27B UD (Q4_K_M) weights.
+
+  model-q4-k-m-gguf-2-of-4:
+    <<: *model-27b
+    summary: Qwen 3.8 27B UD Q4_K_M GGUF weights (shard 2 of 4)
+
+  model-q4-k-m-gguf-3-of-4:
+    <<: *model-27b
+    summary: Qwen 3.8 27B UD Q4_K_M GGUF weights (shard 3 of 4)
+
+  model-q4-k-m-gguf-4-of-4:
+    <<: *model-27b
+    summary: Qwen 3.8 27B UD Q4_K_M GGUF weights (shard 4 of 4)
+
+  llamacpp:
+    type: standard
+    summary: llama.cpp using default CPU instruction sets
+    description: LLM inference in C/C++
+  
+  llamacpp-cuda:
+    type: standard
+    summary: llama.cpp with CUDA backend
+    description: LLM inference in C/C++
+
+apps:
+  qwen3-8:
+    command: bin/modelctl
+    completer: bin/snap-completer.bash
+    plugs:
+      - hardware-observe
+      - opengl
+      - network
+      - desktop # To open the webui in the browser
+    environment:
+      ADDITIONAL_FEATURES: chat, webui
+
+  server:
+    command: bin/server.sh
+    daemon: simple
+    plugs:
+      - network-bind
+      - hardware-observe
+      - opengl
+      - home
+
+  server-webui:
+    command: bin/server-webui.sh
+    daemon: simple
+    plugs:
+      - network-bind
