@@ -1,52 +1,46 @@
 <!--
 # This is the name of the snap. The name that is registered on the snap store and also the name of the cli command.
-snap-name: gemma4
+snap-name: qwen3-8
 # This name is just a friendly name for the snap, it can be used in the documentation
-snap-friendly-name: Gemma 4
+snap-friendly-name: Qwen 3.8
 # URL to model card from the model publisher
-model-card: https://ai.google.dev/gemma/docs/core/model_card_4
+model-card: https://huggingface.co/unsloth/Qwen3.8-27B-GGUF
 # The port that the inference snap will use for its API server.
-http-port: 8080
+http-port: 8356
 # The port that the inference snap will use for its webui server.
-webui-http-port: 8081
+webui-http-port: 8357
 # Optimizations
 engines: cpu, nvidia-gpu
 -->
 
-# {snap-friendly-name} inference snap
-[![{snap-name}](https://snapcraft.io/{snap-name}/badge.svg)](https://snapcraft.io/{snap-name})
+# Qwen 3.8
 
-> This README is a template. Fields wrapped in `{...}` should be replaced with concrete values. If you use an agentic workflow using the included [workshop](#develop-this-snap-in-workshop), the values will get filled automatically.
+[![qwen3-8](https://snapcraft.io/qwen3-8/badge.svg)](https://snapcraft.io/qwen3-8)
 
-Install [{snap-friendly-name}]({model-card}), optimized directly for your hardware.
-This package deploys a high-performance runtime for local inference across arm and x86 platforms. It runs efficiently on pure CPU or leverages hardware acceleration via {NVIDIA, Intel, or AMD GPUs}.
+Qwen3.8 is the most capable generation in the Qwen open-model family to date.
+Built on the architectural foundation of Qwen3.5, Qwen3.8 delivers substantial gains across coding, professional work, research, and long-horizon agentic tasks. Qwen3.8-27B brings these advances to a compact, deployment-friendly dense model: a native vision-language model that understands images and videos, with flexible thinking control, designed to carry complex, multi-step tasks through to completion with greater reliability.
 
-Before starting, install the necessary [drivers](https://documentation.ubuntu.com/inference-snaps/how-to/setup/drivers/) for your accelerator.
+Use this snap to quickly install an optimized environment for local inference with Qwen3.8.
 
-| Engine | Arch | Description |
-|--------------|--------------|-------------|
-| cpu | amd64, arm64 | Optimized for several CPU variants (x86, armv8, armv9) |
-| intel-cpu | amd64 | Optimized for best performance on Intel CPUs |
-| intel-gpu | amd64 | Optimized for Intel integrated and discrete graphics |
-| nvidia-gpu | amd64, arm64 | CUDA-enabled GPU acceleration |
-| {engine} | {arch} | {description} |
+The snap includes the following hardware-optimized inference engines:
+
+* cpu: Optimized for x64 and ARM (armv8, armv9) CPUs
+* nvidia-gpu: CUDA-enabled GPU acceleration
+
+The most suitable engine is automatically selected based on the available hardware.
 
 #### Install
 ```
-sudo snap install {snap-name}
-```
-#### Use
-```
-{snap-name} --help
+sudo snap install qwen3-8
 ```
 
-#### Default configurations
-| Key | Value |
-|-----|-------|
-| http.port | {http-port}   |
-| http.host | 127.0.0.1 |
-| webui.http.port | {webui-http-port}  |
-| webui.http.host | 127.0.0.1 |
+#### Run
+```
+qwen3-8
+```
+
+> [!TIP]
+> Some accelerators require extra [drivers](https://documentation.ubuntu.com/inference-snaps/how-to/setup/drivers/) to be usable with this snap.
 
 ## Resources
 
@@ -58,28 +52,19 @@ sudo snap install {snap-name}
 
 ## Build and install from source
 
-Clone this repo with its submodules:
+Clone the repo:
 ```shell
-git clone --recurse-submodules https://github.com/{owner}/{repository}
+git clone https://github.com/canonical/qwen3.8-snap
+cd qwen3.8-snap
 ```
 
-Prepare the required models by running `make download-models`.
-
-Build the snap and its component:
+Initialize the development environment:
 ```shell
-snapcraft pack -v
+make init
 ```
 
-Refer to the `./dev` directory for additional development tools.
-
-## Develop this snap in a workshop
-
-Start the `workshop` environment and pack the snap with AI agents:
-
+Build and install snap:
 ```shell
-workshop launch
-workshop shell
-opencode
+make build
+make install
 ```
-
-Choose the preferred LLM in opencode and prompt `start packing pipeline` to start the snap creation process. The snap will be built and installed automatically in the workshop environment.
