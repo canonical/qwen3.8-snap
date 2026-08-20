@@ -52,4 +52,3 @@ jobs:
       store-credentials: ${{ secrets.STORE_LOGIN_PR }}
       github-token: ${{ secrets.GITHUB_TOKEN }}
       testflinger-secret-key: ${{ secrets.TESTFLINGER_SECRET_KEY }}
-      logs-secret: ${{ secrets.LOGS_SECRET }}
