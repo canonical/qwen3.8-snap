@@ -22,7 +22,12 @@ jobs:
       build-runner: |
         [
           ["amd64", "large", "noble", "self-hosted"],
-          ["self-hosted", "large", "arm64", "noble"]
+          ["arm64", "large", "noble", "self-hosted"]
+        ]
+      smoke-test-runner: |
+        [
+          ["ubuntu-24.04"],
+          ["arm64", "xlarge", "noble", "self-hosted"]
         ]
       store-track: latest
       snap-name: qwen3-8
