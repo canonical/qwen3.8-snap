@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - fix-smoke-tests
   
   workflow_dispatch: # manual trigger 
 
@@ -23,6 +24,11 @@ jobs:
         [
           ["amd64", "large", "noble", "self-hosted"],
           ["self-hosted", "large", "arm64", "noble"]
+        ]
+      smoke-test-runner: |
+        [
+          ["ubuntu-24.04"],
+          ["self-hosted", "xlarge", "arm64", "noble"]
         ]
       store-track: latest
       snap-name: qwen3-8
