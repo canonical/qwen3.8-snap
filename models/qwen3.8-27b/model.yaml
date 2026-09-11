@@ -23,7 +23,6 @@ components:
   - mmproj-27b-q4-k-m
 
 environment:
-  - MODEL_NAME=qwen3.8-27b-ud-q4-k-m
   - MMPROJ_FILE=$SNAP_COMPONENTS/mmproj-27b-q4-k-m/mmproj-BF16.gguf
   - SHARDS_DIR=/tmp/qwen3-8-27b-ud-q4-k-m-shards
   - MODEL_FILE=$SHARDS_DIR/Qwen3.8-27B-UD-Q4_K_M-00001-of-00004.gguf
