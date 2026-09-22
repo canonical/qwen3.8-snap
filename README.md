@@ -1,20 +1,4 @@
-<!--
-# This is the name of the snap. The name that is registered on the snap store and also the name of the cli command.
-snap-name: qwen3-8
-# This name is just a friendly name for the snap, it can be used in the documentation
-snap-friendly-name: Qwen 3.8
-# URL to model card from the model publisher
-model-card: https://huggingface.co/unsloth/Qwen3.8-27B-GGUF
-# The port that the inference snap will use for its API server.
-http-port: 8356
-# The port that the inference snap will use for its webui server.
-webui-http-port: 8357
-# Optimizations
-engines: cpu, nvidia-gpu
--->
-
-# Qwen 3.8
-
+# Qwen 3.8 snap
 [![qwen3-8](https://snapcraft.io/qwen3-8/badge.svg)](https://snapcraft.io/qwen3-8)
 
 Qwen3.8 is the most capable generation in the Qwen open-model family to date.
